@@ -1,10 +1,15 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+import requests
+import os
+from dotenv import load_dotenv
 
-TOKEN = '7284725214:AAHrwfdFoSBTe6YQpN8rFLwt6Ou0yRYPEEU'
+load_dotenv()
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text('Hello! I am your bot. How can I help you?')
+    print("Command /start executed successfully")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     help_text = (
@@ -13,6 +18,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "/help - Show this help message"
     )
     await update.message.reply_text(help_text)
+    print("Command /help executed successfully")
 
 def get_details() -> str:
     details_text = (
@@ -26,17 +32,26 @@ def get_details() -> str:
 async def details_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     details_text = get_details()
     await update.message.reply_text(details_text)
+    print("Command /details executed successfully")
+    
+async def check_server_connection_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    response = requests.get(os.getenv('POKEMON_SERVICE_URL') + '/checkConnection').json()
+    # details_text = get_details()
+    await update.message.reply_text(response["connection"])
+    print("Command /check_server_connection executed successfully")
 
 def main():
     # Create the Application and pass it your bot's token.
-    application = ApplicationBuilder().token(TOKEN).build()
+    application = ApplicationBuilder().token(os.getenv('TOKEN')).build()
 
     # Register the /start command handler
-    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("start", start_command))
     # Register the /help command handler
     application.add_handler(CommandHandler("help", help_command))
     # Register the /details command handler
     application.add_handler(CommandHandler("details", details_command))
+    # Register the /check_server_connection command handler
+    application.add_handler(CommandHandler("check_server_connection", check_server_connection_command))
 
     # Start the Bot
     application.run_polling()
