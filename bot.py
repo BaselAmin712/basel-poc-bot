@@ -46,7 +46,7 @@ def main():
     application.add_handler(CommandHandler("help", help_command))
     # Register the /details command handler
     application.add_handler(CommandHandler("details", details_command))
-    # Register the /check server connection command handler
+    # Register the /check_server_connection command handler
     application.add_handler(CommandHandler("check_server_connection", check_server_connection))
 
     # Start the Bot
